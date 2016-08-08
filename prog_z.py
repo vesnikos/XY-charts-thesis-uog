@@ -24,20 +24,20 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
                   )
 
     # 7 by 3 axes, returned as a 2-d array
-    f, axarr = plt.subplots(7, 3, sharey=True)
+    f, axarr = plt.subplots(7, 2, sharey=True,)  # Z axis
     for row, cvs in enumerate(dirs):
         d = np.loadtxt(
             fname=os.path.join(CENTER_DATAFOLDER, cvs),
             delimiter=';',
-            usecols=(2, 4, 5),  # acc_xy, err_x, err_y
+            usecols=(3, 6),  # acc_z, err_z
             skiprows=1,  # skip header
             dtype={
-                'names': ('Accuracy XY', 'Error X', 'Error Y'),
-                'formats': ('f4', 'f4', 'f4')
+                'names': ('Accuracy Z', 'Error Z'),
+                'formats': ('f4', 'f4')
             }
         )
 
-        axarr[row, 0].hist(d['Accuracy XY'], 6)
+        axarr[row, 0].hist(d['Accuracy Z'], 6)
         axarr[row, 0].set_ylabel('{0} GCP\n{1} Chk'.format(
             os.path.basename(dirs[row]).split('.')[0],
             os.path.basename(dirs[row]).split('.')[1]
@@ -45,16 +45,19 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
             rotation='horizontal',
             horizontalalignment='right'
         )
-        axarr[row, 1].hist(d['Error X'], 6)
-        axarr[row, 2].hist(d['Error Y'], 6)
+        axarr[row, 1].hist(d['Error Z'], 6)
 
-    # finetuning
+    # finetuning XY
+
+    axarr[0, 0].set_title('Accuracy Z')
+
+    # finetuning XY
     plt.tight_layout()
-    axarr[0, 0].set_title('Accuracy XY')
-    axarr[0, 1].set_title('Error X')
-    axarr[0, 2].set_title('Error Y')
+    axarr[0, 0].set_title('Accuracy Z')
+    axarr[0, 1].set_title('Error Z')
 
-    f.suptitle(' XY Accuracy/Error Distributions (%s)' % m_name, fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    f.suptitle(' Z Accuracy/Error Distributions (%s)' % m_name, fontsize=14, fontweight='bold')
     f.subplots_adjust(top=0.90)
 
-    plt.savefig(os.path.join(CHARTFOLDER, m_name + 'XY'))
+    plt.savefig(os.path.join(CHARTFOLDER, m_name + ' Z'))
