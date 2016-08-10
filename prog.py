@@ -29,15 +29,15 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
         d = np.loadtxt(
             fname=os.path.join(CENTER_DATAFOLDER, cvs),
             delimiter=';',
-            usecols=(2, 4, 5),  # acc_xy, err_x, err_y
+            usecols=(4, 5),  # acc_xy, err_x, err_y
             skiprows=1,  # skip header
             dtype={
-                'names': ('Accuracy XY', 'Error X', 'Error Y'),
-                'formats': ('f4', 'f4', 'f4')
+                'names': ('Error X', 'Error Y'),
+                'formats': ('f4', 'f4')
             }
         )
 
-        axarr[row, 0].hist(d['Accuracy XY'], 6)
+        axarr[row, 0].hist(d['Error X'], 6)
         axarr[row, 0].set_ylabel('{0} GCP\n{1} Chk'.format(
             os.path.basename(dirs[row]).split('.')[0],
             os.path.basename(dirs[row]).split('.')[1]
@@ -45,14 +45,15 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
             rotation='horizontal',
             horizontalalignment='right'
         )
-        axarr[row, 1].hist(d['Error X'], 6)
-        axarr[row, 2].hist(d['Error Y'], 6)
+        axarr[row, 1].hist(d['Error Y'], 6)
+        # absulute of a + bj
+        axarr[row, 2].hist(abs(d['Error X'] + d['Error Y']), 6)
 
     # finetuning
     plt.tight_layout()
-    axarr[0, 0].set_title('Accuracy XY')
-    axarr[0, 1].set_title('Error X')
-    axarr[0, 2].set_title('Error Y')
+    axarr[0, 0].set_title('Error Y')
+    axarr[0, 1].set_title('Error Y')
+    axarr[0, 2].set_title('Error XY ($\sqrt{X^2+Y^2}$)')
 
     f.suptitle(' XY Accuracy/Error Distributions (%s)' % m_name, fontsize=14, fontweight='bold')
     f.subplots_adjust(top=0.90)

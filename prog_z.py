@@ -24,20 +24,20 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
                   )
 
     # 7 by 3 axes, returned as a 2-d array
-    f, axarr = plt.subplots(7, 2, sharey=True,)  # Z axis
+    f, axarr = plt.subplots(7, 2, sharey=True, )  # Z axis
     for row, cvs in enumerate(dirs):
         d = np.loadtxt(
             fname=os.path.join(CENTER_DATAFOLDER, cvs),
             delimiter=';',
-            usecols=(3, 6),  # acc_z, err_z
+            usecols=(4, 5, 6),  # acc_z, err_z
             skiprows=1,  # skip header
             dtype={
-                'names': ('Accuracy Z', 'Error Z'),
-                'formats': ('f4', 'f4')
+                'names': ('Error X', 'Error Y', 'Error Z',),
+                'formats': ('f4', 'f4', 'f4',)
             }
         )
 
-        axarr[row, 0].hist(d['Accuracy Z'], 6)
+        axarr[row, 0].hist(d['Error X'], 6)
         axarr[row, 0].set_ylabel('{0} GCP\n{1} Chk'.format(
             os.path.basename(dirs[row]).split('.')[0],
             os.path.basename(dirs[row]).split('.')[1]
@@ -45,16 +45,18 @@ for m in [CENTER_DATAFOLDER, RANDOM_DATAFOLDER, EDGE_DATAFOLDER]:
             rotation='horizontal',
             horizontalalignment='right'
         )
-        axarr[row, 1].hist(d['Error Z'], 6)
+        axarr[row, 1].hist(
+            np.sqrt(np.power(d['Error Z'], 2) + np.power(d['Error X'], 2) + np.power(d['Error Y'], 2))
+            , 6)
 
     # finetuning XY
 
-    axarr[0, 0].set_title('Accuracy Z')
+    axarr[0, 0].set_title('Error Z')
 
     # finetuning XY
     plt.tight_layout()
-    axarr[0, 0].set_title('Accuracy Z')
-    axarr[0, 1].set_title('Error Z')
+    axarr[0, 0].set_title('Error Z')
+    axarr[0, 1].set_title(r'Error XYZ ($\sqrt{X^2+Y^2+Z^2}$)')
 
     plt.tight_layout()
     f.suptitle(' Z Accuracy/Error Distributions (%s)' % m_name, fontsize=14, fontweight='bold')
